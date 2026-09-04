@@ -1,335 +1,334 @@
-# RAG Intelligence: Document Intelligence Platform
+# RAG Intelligence: AI Powered PDF Document Intelligence & Retrieval-Augmented Generation
 
-An end-to-end **Retrieval-Augmented Generation (RAG)** platform that transforms PDF documents into an intelligent, searchable knowledge base using **semantic retrieval, vector embeddings, and document-grounded question answering**.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-RAG%20Intelligence-00C853?style=for-the-badge&logo=render&logoColor=white)](https://ragpdf-frontend.onrender.com/)
+[![React](https://img.shields.io/badge/React-Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Gemini](https://img.shields.io/badge/Gemini-RAG-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 
-RAG Intelligence allows users to upload PDF documents, automatically process and index their content, search across documents using semantic similarity, and interact with their knowledge base through a conversational AI workspace.
+**Live Application:**  
+https://ragpdf-frontend.onrender.com/
 
-![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
-![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat&logo=postgresql&logoColor=white)
-![pgvector](https://img.shields.io/badge/pgvector-PostgreSQL-blue?style=flat)
-![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white)
-![RAG](https://img.shields.io/badge/RAG-Retrieval--Augmented%20Generation-orange?style=flat)
-![Semantic Search](https://img.shields.io/badge/Semantic%20Search-Vector%20Retrieval-green?style=flat)
+RAG Intelligence is a full-stack AI document intelligence platform that combines **Retrieval-Augmented Generation (RAG)**, semantic vector search, keyword retrieval, document chunking, embeddings, and Gemini-powered answer generation.
 
+The system allows users to upload PDF documents, index their content, search across the document knowledge base, and ask natural-language questions while keeping responses grounded in the selected document.
 
----
-
-## Document Intelligence Workspace
-
-The main workspace provides a centralized interface for interacting with uploaded documents. Users can upload PDFs, select an active document, and ask natural-language questions about the document content.
-
-<img src="docs/images/dashboard.png" width="100%"/>
-
-The workspace is designed around a document-first interaction model, where retrieved information is used to generate grounded responses instead of relying only on general model knowledge.
+> An AI-powered document intelligence system that transforms static PDFs into interactive conversational knowledge bases.
 
 ---
 
-## Document Management
+## Dashboard
 
-The document management interface provides a centralized view of indexed PDF files.
+### Document Workspace
 
-<img src="docs/images/documents.png" width="100%"/>
+![RAG Intelligence Dashboard](docs/images/dashboard.png)
 
-Each uploaded document is processed and indexed into the retrieval pipeline. Users can view available documents, identify the active document, switch between documents, and manage the indexed knowledge base.
+### Conversational Document Q&A
+
+![RAG Intelligence Chat](docs/images/chat1.png)
+
+### Document Management
+
+![RAG Intelligence Documents](docs/images/documents.png)
+
+### Semantic Search
+
+![RAG Intelligence Search](docs/images/search-feature.png)
+
+### PDF Upload & Processing
+
+![RAG Intelligence Upload](docs/images/uploaded.png)
 
 ---
 
-## Semantic Search
-
-RAG Intelligence includes a dedicated semantic search interface for retrieving information across indexed documents.
-
-<img src="docs/images/search-feature.png" width="100%"/>
-
-Instead of depending only on exact keyword matching, the system represents document content and user queries as vectors and performs similarity-based retrieval.
+## Architecture
 
 ```text
-User Query
+                    PDF Document
+                         |
+                         v
+                  PDF Text Extraction
+                         |
+                         v
+                    Text Chunking
+                         |
+                         v
+                 Embedding Generation
+                         |
+                         v
+                PostgreSQL + pgvector
+                         |
+                         |
+User Question ----------+
+                         |
+                         v
+                  Query Embedding
+                         |
+                         v
+              +----------------------+
+              |   Retrieval Layer    |
+              |                      |
+              | Semantic Retrieval   |
+              | Keyword Retrieval    |
+              | Topic Retrieval      |
+              +----------+-----------+
+                         |
+                         v
+                Reciprocal Rank Fusion
+                         |
+                         v
+                 Relevant Chunks
+                         |
+                         v
+                 Context Construction
+                         |
+                         v
+                  Gemini Generation
+                         |
+                         v
+              Grounded AI Response
+                         |
+                +--------+--------+
+                |                 |
+                v                 v
+             Answer            Sources
+````
+
+## RAG Pipeline
+
+```text
+PDF Upload
+     |
+     v
+Text Extraction
+     |
+     v
+Document Chunking
+     |
+     v
+384-Dimensional Embeddings
+     |
+     v
+PostgreSQL + pgvector
+     |
+     v
+User Question
      |
      v
 Query Embedding
      |
-     v
-Vector Similarity Search
-     |
-     v
-Relevant Document Chunks
-     |
-     v
-Retrieved Information
-````
-
-This allows conceptually related information to be retrieved even when the wording of the query differs from the original document.
-
----
-
-## Document-Grounded Question Answering
-
-The conversational interface allows users to ask questions directly about an uploaded document.
-
-<img src="docs/images/chat1.png" width="100%"/>
-
-When a question is submitted, the retrieval pipeline identifies relevant document chunks and provides them as context for the generated response.
-
-The interface also exposes the retrieved sources and their similarity scores, making the retrieval process more transparent.
-
----
-
-## PDF Upload and Processing
-
-Users can upload PDF documents directly through the workspace.
-
-<img src="docs/images/uploaded.png" width="100%"/>
-
-After upload, the document enters the processing pipeline where its content is extracted, divided into manageable chunks, converted into vector embeddings, and stored for semantic retrieval.
-
----
-
-## RAG Architecture
-
-```text
-                    PDF DOCUMENT
-                         |
-                         v
-                  Document Upload
-                         |
-                         v
-                   Text Extraction
-                         |
-                         v
-                    Chunking
-                         |
-                         v
-                 Embedding Model
-                         |
-                         v
-              PostgreSQL + pgvector
-                         |
-                         |
-User Query ------------>|
-                         |
-                         v
-                Semantic Retrieval
-                         |
-                         v
-               Relevant Top-K Chunks
-                         |
-                         v
-                 RAG Context
-                         |
-                         v
-                Response Generation
-                         |
-                         v
-             Grounded Answer + Sources
+     +------------------------+
+     |                        |
+     v                        v
+Semantic Search         Keyword Search
+     |                        |
+     +------------+-----------+
+                  |
+                  v
+        Reciprocal Rank Fusion
+                  |
+                  v
+          Relevant Context
+                  |
+                  v
+             Gemini LLM
+                  |
+                  v
+        Grounded Response
+                  |
+                  v
+          Answer + Sources
 ```
 
----
+## Key Capabilities
 
-## Core Features
+PDF Document Processing
 
-| Feature                  | Description                                                  |
-| ------------------------ | ------------------------------------------------------------ |
-| PDF Processing           | Upload and process PDF documents                             |
-| Text Extraction          | Extract textual content from uploaded documents              |
-| Chunking                 | Divide documents into retrieval-friendly chunks              |
-| Vector Embeddings        | Convert document chunks into semantic vector representations |
-| Vector Database          | Store embeddings using PostgreSQL and pgvector               |
-| Semantic Search          | Retrieve information based on semantic similarity            |
-| RAG                      | Generate responses using retrieved document context          |
-| Source Retrieval         | Display relevant document chunks and similarity scores       |
-| Document Management      | View, select and manage indexed documents                    |
-| Active Documents         | Direct questions toward the selected document                |
-| Conversational Interface | Ask natural-language questions about documents               |
+Users can upload PDF documents which are processed into searchable document chunks.
 
----
+The processing pipeline performs:
+
+PDF text extraction
+Document chunking
+Embedding generation
+Vector storage
+Metadata storage
+
+Semantic Retrieval
+
+The system uses vector embeddings to retrieve semantically relevant document chunks.
+
+Embedding model:
+
+`Xenova/all-MiniLM-L6-v2`
+
+Embedding dimension:
+
+`384`
+
+The semantic retrieval layer allows questions to match conceptually related content even when the wording differs.
+
+Keyword Retrieval
+
+A keyword-based retrieval layer complements semantic search by identifying important lexical matches within the selected document.
+
+This helps retrieve exact terminology, technical names, and phrases that may not receive the highest semantic similarity score.
+
+Reciprocal Rank Fusion
+
+Multiple retrieval rankings are combined using Reciprocal Rank Fusion to improve the final ordering of relevant chunks.
+
+```text
+Semantic Retrieval
+        +
+Keyword Retrieval
+        +
+Additional Retrieval Signals
+        |
+        v
+Reciprocal Rank Fusion
+        |
+        v
+Final Ranked Context
+```
+
+Document-Grounded Question Answering
+
+The system associates each question with a selected PDF document.
+
+The retrieval process searches the selected document and passes the most relevant chunks to Gemini before generating the answer.
+
+This prevents unrelated indexed documents from being treated as factual context for the current question.
+
+When the requested information cannot be supported by the selected document, the system can return:
+
+`I couldn't find that information in this document.`
+
+Conversational Follow-Up Questions
+
+RAG Intelligence supports contextual follow-up questions using recent conversation history.
+
+Example:
+
+```text
+User:
+What are the main technologies?
+
+Assistant:
+React, Node.js, PostgreSQL...
+
+User:
+Which one was used for the frontend?
+
+Assistant:
+...
+```
+
+Conversation history is used to understand references and follow-up intent while the selected document remains the primary factual source.
+
+Document Management
+
+The application provides a dedicated document workspace where users can:
+
+View indexed documents
+Select an active document
+Rename documents
+Delete documents
+View document metadata
+
+Semantic Search
+
+The Search workspace uses the retrieval infrastructure to find relevant information from indexed document content.
+
+Users can search the knowledge base without manually navigating through PDF pages.
+
+Source Transparency
+
+RAG responses return retrieved source information alongside the generated answer.
+
+The interface displays:
+
+Source filename
+Chunk index
+Similarity / match score
+
+This makes the retrieval process more transparent and helps users understand where an answer came from.
+
+## Gemini Answer Generation
+
+The final generation layer uses the Gemini API to transform retrieved document context into a natural-language response.
+
+The model is instructed to:
+
+Use the selected document as the factual source
+Avoid unsupported external information
+Use conversation history only for contextual understanding
+Provide concise and natural responses
+Return a document-grounded fallback when information is unavailable
 
 ## Technology Stack
 
 ### Frontend
 
-**React**
-Component-based interface for the document intelligence workspace.
+React
 
-**Vite**
-Fast development and frontend build tooling.
+Vite
 
-**Tailwind CSS**
-Utility-first styling used to create the modern dark interface.
+Tailwind CSS
 
-### Backend
+Lucide React
 
-**Node.js**
-Runtime environment for the application backend.
-
-**Express.js**
-Backend framework responsible for API and application services.
-
-### AI and Retrieval
-
-**Retrieval-Augmented Generation (RAG)**
-Combines retrieval with generative AI to produce document-grounded responses.
-
-**Vector Embeddings**
-Represent document chunks and queries in a semantic vector space.
-
-**Semantic Search**
-Retrieves relevant information based on meaning rather than only exact keywords.
-
-### Database and Infrastructure
-
-**PostgreSQL**
-Primary database for storing document and application data.
-
-**pgvector**
-Provides vector storage and similarity search capabilities inside PostgreSQL.
-
-**Redis**
-Used as supporting infrastructure for application-level data and processing.
-
-### Document Processing
-
-**PDF Text Extraction**
-Extracts content from uploaded PDF documents.
-
-**Document Chunking**
-Breaks extracted content into smaller units optimized for retrieval.
-
----
-
-## End-to-End Workflow
-
-```text
-1. User uploads a PDF
-          |
-          v
-2. Document content is extracted
-          |
-          v
-3. Content is divided into chunks
-          |
-          v
-4. Embeddings are generated
-          |
-          v
-5. Embeddings are stored in pgvector
-          |
-          v
-6. User asks a question
-          |
-          v
-7. Query embedding is generated
-          |
-          v
-8. Relevant chunks are retrieved
-          |
-          v
-9. Retrieved context is passed to RAG
-          |
-          v
-10. Grounded response is generated
-          |
-          v
-11. Sources are displayed to the user
-```
-
----
-
-## Project Structure
-
-```text
-RAGPDF/
-│
-├── backend/
-│   └── ...
-│
-├── frontend/
-│   └── ...
-│
-├── docs/
-│   └── images/
-│       ├── dashboard.png
-│       ├── documents.png
-│       ├── search-feature.png
-│       ├── chat1.png
-│       └── uploaded.png
-│
-└── README.md
-```
-
----
-
-## Running Locally
+JavaScript / JSX
 
 ### Backend
 
-```bash
-cd backend
-npm install
-npm run dev
-```
+Node.js
 
-Backend:
+Express.js
 
-```text
-http://localhost:5050
-```
+CORS
 
-### Frontend
+Multer
 
-Open another terminal:
+dotenv
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+### AI & Retrieval
 
-Frontend:
+Gemini API
 
-```text
-http://localhost:5173
-```
+Retrieval-Augmented Generation
 
-Make sure PostgreSQL with pgvector, Redis, and the required environment variables are configured before starting the application.
+Xenova/all-MiniLM-L6-v2
 
----
+Vector Embeddings
 
-## Why RAG Intelligence?
+Semantic Retrieval
 
-Traditional document systems often rely on keyword matching or manual navigation through large files.
+Keyword Retrieval
 
-RAG Intelligence combines **document processing, vector embeddings, semantic retrieval, and generative AI** to create a more intelligent document interaction workflow.
+Reciprocal Rank Fusion
 
-The result is a platform where users can move from:
+### Database
 
-**PDF → Search → Retrieval → Context → Grounded Answer**
+PostgreSQL 17
 
-without manually searching through every page of a document.
+pgvector
 
----
+### Infrastructure
 
-## Future Improvements
+Redis
 
-* Hybrid keyword and vector retrieval
-* Retrieval reranking
-* Multi-document conversations
-* Streaming responses
-* OCR support for scanned documents
-* Page-level source references
-* User authentication
-* Advanced metadata filtering
-* Additional document formats
-* Retrieval evaluation and benchmarking
+Render Key Value
 
----
+### Deployment
 
-## Author
+GitHub
 
-**Rajat Murhe**
+Render Static Site
 
-B.Tech Computer Science Engineering
+Render Web Service
 
-```
+Render PostgreSQL
+
+Render Key Value
