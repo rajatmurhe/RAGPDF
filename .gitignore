@@ -1,0 +1,23 @@
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# OS/editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Runtime uploads/data
+backend/uploads/*
+!backend/uploads/.gitkeep
