@@ -22,7 +22,8 @@ FileSearch,
 Trash2,
 MoreHorizontal,
 } from "lucide-react";
-const API_URL = "http://localhost:5050";
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5050";
 /* ============================================================
 SIDEBAR
 ============================================================ */
@@ -311,7 +312,7 @@ onClick={() => setSidebarOpen(false)}
         </div>
 
         <div className="mt-2 text-[11px] text-zinc-600">
-          localhost:5050
+          {API_URL.replace(/^https?:\/\//, "")}
         </div>
       </div>
 
