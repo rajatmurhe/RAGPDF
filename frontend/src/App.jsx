@@ -24,6 +24,90 @@ MoreHorizontal,
 } from "lucide-react";
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5050";
+
+function renderAssistantContent(text) {
+  const normalized = String(text ?? "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\\([*_`])/g, "$1");
+
+  const renderInline = (value) => {
+    const parts = [];
+    const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+
+    let lastIndex = 0;
+    let match;
+
+    while ((match = pattern.exec(value)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(value.slice(lastIndex, match.index));
+      }
+
+      const token = match[0];
+
+      if (token.startsWith("**") && token.endsWith("**")) {
+        parts.push(
+          <strong
+            key={`bold-${match.index}`}
+            className="font-semibold text-white"
+          >
+            {token.slice(2, -2)}
+          </strong>
+        );
+      } else {
+        parts.push(
+          <em key={`italic-${match.index}`}>
+            {token.slice(1, -1)}
+          </em>
+        );
+      }
+
+      lastIndex = pattern.lastIndex;
+    }
+
+    if (lastIndex < value.length) {
+      parts.push(value.slice(lastIndex));
+    }
+
+    return parts.length ? parts : value;
+  };
+
+  return normalized.split("\n").map((line, index) => {
+    const trimmed = line.trim();
+
+    const bulletMatch = trimmed.match(/^[-*]\s+(.+)$/);
+    const numberedMatch = trimmed.match(/^(\d+)[.)]\s+(.+)$/);
+
+    const content = bulletMatch
+      ? bulletMatch[1]
+      : numberedMatch
+        ? numberedMatch[2]
+        : line;
+
+    return (
+      <div
+        key={`assistant-line-${index}`}
+        className={
+          bulletMatch || numberedMatch
+            ? "flex min-h-[1.75rem] gap-2"
+            : "min-h-[1.75rem]"
+        }
+      >
+        {bulletMatch && (
+          <span className="shrink-0 text-zinc-500">•</span>
+        )}
+
+        {numberedMatch && (
+          <span className="shrink-0 text-zinc-500">
+            {numberedMatch[1]}.
+          </span>
+        )}
+
+        <span>{renderInline(content)}</span>
+      </div>
+    );
+  });
+}
+
 /* ============================================================
 SIDEBAR
 ============================================================ */
@@ -689,7 +773,7 @@ className={`relative min-h-screen flex-1 overflow-hidden transition-[margin] dur
                         You
                       </div>
 
-                      {message.content}
+                      {renderAssistantContent(message.content)}
                     </div>
                   )}
 
@@ -1239,7 +1323,7 @@ className={`relative min-h-screen flex-1 overflow-hidden transition-[margin] dur
                   </div>
 
                   <div className="whitespace-pre-wrap text-sm leading-7 text-zinc-200">
-                    {result.answer}
+                    {renderAssistantContent(result.answer)}
                   </div>
 
                   {result.sources?.length >
