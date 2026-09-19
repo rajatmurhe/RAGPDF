@@ -810,6 +810,8 @@ function extractCollectionList(question, rows) {
   const sectionStopPattern =
     /\b(advantages?|disadvantages?|benefits?|drawbacks?)\b/i;
 
+  const candidates = [];
+
   for (const row of sortForContext(rows)) {
     const raw =
       String(row?.content || "")
@@ -830,25 +832,27 @@ function extractCollectionList(question, rows) {
         .filter(Boolean);
 
     for (let i = 0; i < segments.length; i++) {
-      let heading = segments[i];
+      const segment =
+        segments[i];
+
+      const typeIndex =
+        segment.search(typePattern);
+
+      if (typeIndex < 0) {
+        continue;
+      }
+
+      const heading =
+        segment
+          .slice(typeIndex)
+          .trim();
 
       if (
-        !typePattern.test(heading) ||
         !terms.some((term) =>
           heading.toLowerCase().includes(term)
         )
       ) {
         continue;
-      }
-
-      const typeIndex =
-        heading.search(typePattern);
-
-      if (typeIndex >= 0) {
-        heading =
-          heading
-            .slice(typeIndex)
-            .trim();
       }
 
       const items = [];
@@ -861,6 +865,12 @@ function extractCollectionList(question, rows) {
       ) {
         const item =
           segments[j].trim();
+
+        if (
+          typePattern.test(item)
+        ) {
+          break;
+        }
 
         if (
           sectionStopPattern.test(item)
@@ -887,21 +897,54 @@ function extractCollectionList(question, rows) {
       }
 
       if (items.length >= 2) {
-        return (
-          [heading, ...items]
-            .slice(0, 7)
-            .map((item, index) =>
-              index === 0
-                ? item
-                : `• ${item}`
-            )
-            .join("\n")
-        );
+        candidates.push({
+          heading,
+          items,
+          position: i,
+        });
       }
     }
   }
 
-  return "";
+  if (!candidates.length) {
+    return "";
+  }
+
+  candidates.sort(
+    (a, b) => {
+      if (
+        b.items.length !==
+        a.items.length
+      ) {
+        return (
+          b.items.length -
+          a.items.length
+        );
+      }
+
+      return (
+        b.position -
+        a.position
+      );
+    }
+  );
+
+  const selected =
+    candidates[0];
+
+  return (
+    [
+      selected.heading,
+      ...selected.items,
+    ]
+      .slice(0, 9)
+      .map((item, index) =>
+        index === 0
+          ? item
+          : `• ${item}`
+      )
+      .join("\n")
+  );
 }
 
 function deterministicCollection(
