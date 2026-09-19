@@ -28,7 +28,7 @@ const API_URL =
 function renderAssistantContent(text) {
   const normalized = String(text ?? "")
     .replace(/\r\n?/g, "\n")
-    .replace(/\\([*_`])/g, "$1");
+    .replace(/\\+([*_`])/g, "$1");
 
   const renderInline = (value) => {
     const parts = [];
