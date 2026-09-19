@@ -18,7 +18,9 @@ function cleanAnswer(text) {
     .replace(/^answer\s*:\s*/i, "")
     .replace(/^response\s*:\s*/i, "")
     .replace(/^assistant\s*:\s*/i, "")
-    .replace(/\s+/g, " ")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
 
