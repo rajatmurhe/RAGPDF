@@ -799,7 +799,7 @@ className={`relative min-h-screen flex-1 overflow-hidden transition-[margin] dur
                             : "text-zinc-200"
                         }`}
                       >
-                        {message.content}
+                        {renderAssistantContent(message.content)}
                       </div>
 
                       {message.sources &&
