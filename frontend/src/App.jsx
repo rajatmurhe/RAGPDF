@@ -65,8 +65,12 @@ function renderAssistantContent(text) {
     }
 
     if (lastIndex < value.length) {
-      parts.push(value.slice(lastIndex));
-    }
+      const remaining = value.slice(lastIndex);
+
+      if (remaining.trim() !== "*") {
+        parts.push(remaining);
+        }
+      }
 
     return parts.length ? parts : value;
   };
