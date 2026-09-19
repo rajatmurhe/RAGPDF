@@ -212,6 +212,16 @@ function isCollectionQuestion(question) {
       .toLowerCase()
       .trim();
 
+  const asksForTypes =
+    /\b(types?|kinds?|categories|forms|variants)\b/.test(
+      q
+    );
+
+  const listIntent =
+    /\b(list|show|tell|give|name|identify|enumerate)\b/.test(
+      q
+    );
+
   return (
     /\b(elaborate|expand|explain|describe|discuss)\b/.test(
       q
@@ -221,7 +231,8 @@ function isCollectionQuestion(question) {
     /\bwhat were\b/.test(q) ||
     /\bmain\b.*\b(items|points|parts|sections|topics)\b/.test(
       q
-    )
+    ) ||
+    (asksForTypes && listIntent)
   );
 }
 
@@ -789,10 +800,124 @@ function deterministicRelevant(
   );
 }
 
+function extractCollectionList(question, rows) {
+  const terms =
+    questionTerms(question);
+
+  const typePattern =
+    /\b(types?|kinds?|categories|forms|variants)\b/i;
+
+  const sectionStopPattern =
+    /\b(advantages?|disadvantages?|benefits?|drawbacks?)\b/i;
+
+  for (const row of sortForContext(rows)) {
+    const raw =
+      String(row?.content || "")
+        .replace(/\r\n?/g, "\n")
+        .replace(/[•●▪◦]/g, "\n")
+        .replace(/[ \t]+/g, " ")
+        .trim();
+
+    const segments =
+      raw
+        .split(/\n+/)
+        .map((segment) =>
+          segment
+            .replace(/^[-*]\s*/, "")
+            .replace(/\s+/g, " ")
+            .trim()
+        )
+        .filter(Boolean);
+
+    for (let i = 0; i < segments.length; i++) {
+      let heading = segments[i];
+
+      if (
+        !typePattern.test(heading) ||
+        !terms.some((term) =>
+          heading.toLowerCase().includes(term)
+        )
+      ) {
+        continue;
+      }
+
+      const typeIndex =
+        heading.search(typePattern);
+
+      if (typeIndex >= 0) {
+        heading =
+          heading
+            .slice(typeIndex)
+            .trim();
+      }
+
+      const items = [];
+
+      for (
+        let j = i + 1;
+        j < segments.length &&
+        items.length < 8;
+        j++
+      ) {
+        const item =
+          segments[j].trim();
+
+        if (
+          sectionStopPattern.test(item)
+        ) {
+          break;
+        }
+
+        if (
+          item.length < 2 ||
+          item.length > 160
+        ) {
+          continue;
+        }
+
+        if (
+          items.length >= 2 &&
+          item.length > 80 &&
+          /[.!?]$/.test(item)
+        ) {
+          break;
+        }
+
+        items.push(item);
+      }
+
+      if (items.length >= 2) {
+        return (
+          [heading, ...items]
+            .slice(0, 7)
+            .map((item, index) =>
+              index === 0
+                ? item
+                : `• ${item}`
+            )
+            .join("\n")
+        );
+      }
+    }
+  }
+
+  return "";
+}
+
 function deterministicCollection(
   question,
   rows
 ) {
+  const listAnswer =
+    extractCollectionList(
+      question,
+      rows
+    );
+
+  if (listAnswer) {
+    return listAnswer;
+  }
+
   const terms =
     questionTerms(
       question
